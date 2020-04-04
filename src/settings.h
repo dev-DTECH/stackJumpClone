@@ -16,11 +16,19 @@
 
 #define BACKGROUND_TEXTURE_FILE "resources/sky1.png"
 #define PLAYER_TEXTURE_FILE "resources/slime.png"
+#define GROUND_TEXTURE_FILE "resources/2dplatform.png"
+#define PLANK_TEXTURE_FILE "resources/plank.png"
 
+#define PLANK_TEXTURE_WIDTH 20
 #define PLAYER_TEXTURE_WIDTH 34
 #define PLAYER_TEXTURE_HEIGHT PLAYER_TEXTURE_WIDTH
+#define PLAYER_JUMP_VELOCITY 0.5
 
-#define ACCELERATION_DUE_TO_GRAVITY 0.5
+
+#define PLANK_VELOCITY_X 0.1
+
+
+#define ACCELERATION_DUE_TO_GRAVITY 0.001
 
 
 

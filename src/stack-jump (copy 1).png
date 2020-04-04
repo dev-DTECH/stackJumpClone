@@ -330,7 +330,7 @@ int main()
 		// {
 		// 	window.draw(plank_ar[i]);
 		// }
-		// std::cout << plank_ar[0].plankSprite.getGlobalBounds().height << std::endl;
+		// std::cout << plank_ar[0].plankSprite.getGlobalBounds().height << PLANK_TEXTURE_FILE << "\n";
 
 		window.draw(plank);
 		// window.draw(lastPlank);

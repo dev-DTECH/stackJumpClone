@@ -94,12 +94,13 @@ class Plank : public sf::Drawable
 {
 public:
 	sf::Sprite plankSprite;
-	// float initialPositionY;
-	float velocityX;
+	float initialPositionY;
+	float initialPositionX;
+	float velocityX = 0.0;
 	Plank()
 	{
 		// plankSprite = nullptr;
-		velocityX = 0;
+		velocityX = 0.0;
 	}
 	Plank(sf::Texture &plankTexture) : plankSprite(plankTexture)
 	{
@@ -107,8 +108,10 @@ public:
 		plankSprite.setPosition(WINDOW_WIDTH, (WINDOW_HEIGHT / 2.0) - (plankSprite.getLocalBounds().height));
 		// place at bottom-middle of window
 
-		//std::cout << playerSprite.setPosition((WINDOW_WIDTH / 2.0) - (playerSprite.getLocalBounds().width / 2.0), (WINDOW_HEIGHT - playerSprite.getLocalBounds().height)) << std::endl;
-		// initialPositionY = playerSprite.getGlobalBounds().top;
+		// std::cout << playerSprite.setPosition((WINDOW_WIDTH / 2.0) - (playerSprite.getLocalBounds().width / 2.0), (WINDOW_HEIGHT - playerSprite.getLocalBounds().height)) << std::endl;
+		initialPositionX = WINDOW_WIDTH;
+
+		initialPositionY = (WINDOW_HEIGHT / 2.0) - (plankSprite.getLocalBounds().height);
 		// initialPositionY = (WINDOW_HEIGHT / 2.0);
 	}
 	void pushDown()
@@ -181,13 +184,14 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	Plank plank_ar[10];
-	for (int i = 0; i < 10; i++)
+	Plank plank_ar[NO_OF_PLANKS];
+	for (int i = 0; i < NO_OF_PLANKS; i++)
 	{
 		plank_ar[i] = Plank(plankTexture);
 	}
 	unsigned int plankIndex = 0;
-	Plank plank = plank_ar[0];
+	float plankVelocityX = INITIAL_PLANK_VELOCITY_X;
+	// Plank plank = plank_ar[0];
 	// Plank lastPlank = plank_ar[0];
 	// Plank plankForRender[10];
 
@@ -197,7 +201,7 @@ int main()
 	// }
 	// std::cerr << plank_ar[5].plankSprite.getGlobalBounds().height << PLANK_TEXTURE_FILE << "\n";
 
-	plank.velocityX = -PLANK_VELOCITY_X;
+	plank_ar[plankIndex].velocityX = -plankVelocityX;
 
 	///////PLAYER///////
 	sf::Texture playerTexture;
@@ -229,6 +233,12 @@ int main()
 			std::cout << "FPS : " << frameCounter << "\n";
 			currentFPS = frameCounter;
 			frameCounter = 0;
+			// for (int i = 0; i < 10; i++)
+			// {
+			// 	std::cout << plank_ar[i].plankSprite.getPosition().x << "," << plank_ar[i].plankSprite.getPosition().y << std::endl;
+			// 	// window.draw(plank_ar[i]);
+			// }
+			// std::cout << ground.groundSprite.getPosition().y << std::endl;
 		}
 
 		/////UPDATE TIME/////
@@ -271,12 +281,17 @@ int main()
 
 		player.velocityY += ACCELERATION_DUE_TO_GRAVITY * dt;
 		player.playerSprite.setPosition(player.playerSprite.getPosition().x, player.playerSprite.getPosition().y + player.velocityY * dt);
-		plank.plankSprite.setPosition(plank.plankSprite.getPosition().x + plank.velocityX * dt, plank.plankSprite.getPosition().y);
+		plank_ar[plankIndex].plankSprite.setPosition(plank_ar[plankIndex].plankSprite.getPosition().x + plank_ar[plankIndex].velocityX * dt, plank_ar[plankIndex].plankSprite.getPosition().y);
 
-		if (plank.plankSprite.getPosition().x < 0)
-			plank.velocityX = +PLANK_VELOCITY_X;
-		if (plank.plankSprite.getPosition().x + plank.plankSprite.getLocalBounds().width > WINDOW_WIDTH)
-			plank.velocityX = -PLANK_VELOCITY_X;
+		// plank_ar[plankIndex] = plank;
+
+		// std::cout << plank_ar[plankIndex].plankSprite.getPosition().y << std::endl;
+		// std::cout << plankIndex << std::endl;
+
+		if (plank_ar[plankIndex].plankSprite.getPosition().x < 0)
+			plank_ar[plankIndex].velocityX = +plankVelocityX;
+		if (plank_ar[plankIndex].plankSprite.getPosition().x + plank_ar[plankIndex].plankSprite.getLocalBounds().width > WINDOW_WIDTH)
+			plank_ar[plankIndex].velocityX = -plankVelocityX;
 
 		///////COLLISION DETECTION///////
 		if (player.playerSprite.getPosition().y >= (player.initialPositionY))
@@ -287,22 +302,36 @@ int main()
 			player.playerSprite.setTextureRect(player.animationTextureRects.at(player.animationIndex));
 			if (player.jumping)
 			{
-				if (plank.plankSprite.getPosition().x < (player.playerSprite.getPosition().x + player.playerSprite.getGlobalBounds().width) && //left
-					player.playerSprite.getPosition().x < (plank.plankSprite.getPosition().x + plank.plankSprite.getGlobalBounds().width))	 //right
+				if (plank_ar[plankIndex].plankSprite.getPosition().x < (player.playerSprite.getPosition().x + player.playerSprite.getGlobalBounds().width) &&			 //left
+					player.playerSprite.getPosition().x < (plank_ar[plankIndex].plankSprite.getPosition().x + plank_ar[plankIndex].plankSprite.getGlobalBounds().width)) //right
 				{
 					std::cout << "You hit the plank" << std::endl;
-					plank.velocityX = 0;
+					plank_ar[plankIndex].velocityX = 0;
 					ground.pushDown();
-					plank.pushDown();
+					for (int i = 0; i < NO_OF_PLANKS; i++)
+					{
+						plank_ar[i].pushDown();
+					}
+
+					// plank_ar[plankIndex].pushDown();
+					// plank_ar[plankIndex].plankSprite.setPosition(plank_ar[plankIndex].plankSprite.getPosition().x, plank_ar[plankIndex].plankSprite.getPosition().y + PLANK_TEXTURE_WIDTH);
+
 					// lastPlank = plank;
 					// plank_ar[plankIndex] = plank;
+					// plank_ar[plankIndex].plankSprite.setPosition(plank.plankSprite.getPosition().x, plank.plankSprite.getPosition().y);
 					plankIndex++;
-					plank = plank_ar[plankIndex];
+					// plank = plank_ar[plankIndex];
+					if (plankIndex >= NO_OF_PLANKS)
+						plankIndex = 0;
+
+					plankVelocityX+=RATE_OF_INCREASE_IN_PLANK_VELOCITY_X*dt;
+					plank_ar[plankIndex].velocityX = -plankVelocityX;
+					plank_ar[plankIndex].plankSprite.setPosition(plank_ar[plankIndex].initialPositionX, plank_ar[plankIndex].initialPositionY);
 				}
 			}
 
-			if ((plank.plankSprite.getPosition().x < (player.playerSprite.getPosition().x + player.playerSprite.getGlobalBounds().width) && //left
-				 player.playerSprite.getPosition().x < (plank.plankSprite.getPosition().x + plank.plankSprite.getGlobalBounds().width)) &&
+			if ((plank_ar[plankIndex].plankSprite.getPosition().x < (player.playerSprite.getPosition().x + player.playerSprite.getGlobalBounds().width) && //left
+				 player.playerSprite.getPosition().x < (plank_ar[plankIndex].plankSprite.getPosition().x + plank_ar[plankIndex].plankSprite.getGlobalBounds().width)) &&
 				!player.jumping)
 			{
 				std::cout << "You fall off the stack" << std::endl;
@@ -326,13 +355,13 @@ int main()
 		window.draw(background);
 		window.draw(ground);
 
-		// for (int i = 0; i < 10; i++)
-		// {
-		// 	window.draw(plank_ar[i]);
-		// }
+		for (int i = 0; i < NO_OF_PLANKS; i++)
+		{
+			window.draw(plank_ar[i]);
+		}
 		// std::cout << plank_ar[0].plankSprite.getGlobalBounds().height << std::endl;
 
-		window.draw(plank);
+		// window.draw(plank);
 		// window.draw(lastPlank);
 
 		// window.draw(plank_ar[0]);
